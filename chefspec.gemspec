@@ -27,11 +27,11 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 1.9'
 
   s.add_dependency 'chef',    '>= 11.14'
-  s.add_dependency 'fauxhai', '~> 3.0', '>= 3.0.1'
+  s.add_dependency 'fauxhai', '~> 3.2'
   s.add_dependency 'rspec',   '~> 3.0'
 
   # Development Dependencies
-  s.add_development_dependency 'rake'
+  s.add_development_dependency 'rake',      '< 11.0'
   s.add_development_dependency 'redcarpet', '~> 3.3'
   s.add_development_dependency 'yard',      '~> 0.8'
 

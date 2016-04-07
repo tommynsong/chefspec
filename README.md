@@ -145,6 +145,16 @@ Requiring this file will:
 - Download all the dependencies listed in your `Berksfile` into the temporary directory
 - Set ChefSpec's `cookbook_path` to the temporary directory
 
+You can customize the list of options passed to the installation command using the `berkshelf_options` RSpec configuration:
+
+```ruby
+RSpec.configuration do |config|
+  config.berkshelf_options = { only: "my-group" }
+end
+```
+
+This is a Ruby hash and valid options include `only` and `except`.
+
 ### Librarian
 
 If you are using Librarian, simply require `chefspec/librarian` in your `spec_helper` after requiring `chefspec`:
@@ -558,6 +568,31 @@ describe 'example::default' do
   before do
     stub_command(/(foo)|(bar)/).and_return(true)
   end
+end
+```
+
+### Library Helpers
+
+Given a library helper with a `has_bacon?` method:
+
+```ruby
+module Demo
+  module Helper
+
+    include Chef::Mixin::ShellOut
+
+    def has_bacon?
+      cmd = shell_out!('getent passwd bacon', {:returns => [0,2]})
+      cmd.stderr.empty? && (cmd.stdout =~ /^bacon/)
+    end
+  end
+end
+```
+
+Stub the output of the library helper. [Additional information](http://jtimberman.housepub.org/blog/2015/05/30/quick-tip-stubbing-library-helpers-in-chefspec/)
+```ruby
+before do
+  allow_any_instance_of(Chef::Node).to receive(:has_bacon?).and_return(true)
 end
 ```
 
