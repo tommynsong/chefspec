@@ -10,13 +10,7 @@ module ChefSpec
     # @return [ChefZero::Server]
     #
     def server
-      @server ||= ChefZero::Server.new(
-        # Set the log level from RSpec, defaulting to warn
-        log_level:  RSpec.configuration.log_level || :warn,
-
-        # Set a random port so ChefSpec may be run in multiple contexts
-        port: port,
-      )
+      ChefSpec::ZeroServer.server
     end
 
     #
@@ -70,8 +64,11 @@ module ChefSpec
           data = get('#{key}', name)
           json = JSON.parse(data)
 
-          if #{klass}.respond_to?(:json_create)
+          case
+          when #{klass}.respond_to?(:json_create)
             #{klass}.json_create(json)
+          when #{klass}.respond_to?(:from_hash)
+            #{klass}.from_hash(json)
           else
             #{klass}.new(json)
           end
@@ -91,11 +88,11 @@ module ChefSpec
       EOH
     end
 
-    entity :client,      Chef::Client, 'clients'
-    entity :data_bag,    Chef::DataBag, 'data'
-    entity :environment, Chef::Environment, 'environments'
-    entity :node,        Chef::Node, 'nodes'
-    entity :role,        Chef::Role, 'roles'
+    entity :client,      Chef::Client, "clients"
+    entity :data_bag,    Chef::DataBag, "data"
+    entity :environment, Chef::Environment, "environments"
+    entity :node,        Chef::Node, "nodes"
+    entity :role,        Chef::Role, "roles"
 
     #
     # Create a new data_bag on the Chef Server. This overrides the method
@@ -107,7 +104,7 @@ module ChefSpec
     #   the data to load into the data bag
     #
     def create_data_bag(name, data = {})
-      load_data(name, 'data', data)
+      load_data(name, "data", data)
     end
 
     #
@@ -121,7 +118,7 @@ module ChefSpec
     #
     # @example Create a node from a +Chef::Node+ object
     #
-    #   node = stub_node('bacon', platform: 'ubuntu', version: '12.04')
+    #   node = stub_node('bacon', platform: 'ubuntu', version: '18.04')
     #   create_node(node)
     #
     # @param [String, Chef::Node] object
@@ -141,7 +138,7 @@ module ChefSpec
         data = JSON.fast_generate(data)
       end
 
-      load_data(name, 'nodes', data)
+      load_data(name, "nodes", data)
     end
     alias_method :update_node, :create_node
 
@@ -157,19 +154,19 @@ module ChefSpec
     #   to the server
     #
     def load_data(name, key, data = {})
-      @server.load_data({ key => { name => data } })
+      ChefSpec::ZeroServer.load_data(name, key, data)
     end
 
     #
     # Get the path to an item in the data store.
     #
     def get(*args)
-      args.unshift('organizations', 'chef')
+      args.unshift("organizations", "chef")
 
       if args.size == 3
-        @server.data_store.list(args)
+        server.data_store.list(args)
       else
-        @server.data_store.get(args)
+        server.data_store.get(args)
       end
     end
   end

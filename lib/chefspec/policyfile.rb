@@ -1,8 +1,8 @@
 begin
-  require 'chef-dk/policyfile_services/export_repo'
-  require 'chef-dk/policyfile_services/install'
+  require "chef-cli/policyfile_services/export_repo"
+  require "chef-cli/policyfile_services/install"
 rescue LoadError
-  raise ChefSpec::Error::GemLoadError.new(gem: 'chef-dk', name: 'ChefDK')
+  raise ChefSpec::Error::GemLoadError.new(gem: "chef-cli", name: "ChefCLI")
 end
 
 module ChefSpec
@@ -22,16 +22,19 @@ module ChefSpec
     # Setup and install the necessary  dependencies in the temporary directory
     #
     def setup!
-      policyfile_path = File.join(Dir.pwd, 'Policyfile.rb')
+      policyfile_path = RSpec.configuration.policyfile_path
+      if policyfile_path.nil?
+        policyfile_path = File.join(Dir.pwd, "Policyfile.rb")
+      end
 
-      installer = ChefDK::PolicyfileServices::Install.new(
+      installer = ChefCLI::PolicyfileServices::Install.new(
         policyfile: policyfile_path,
-        ui: ChefDK::UI.null
+        ui: ChefCLI::UI.null
       )
 
       installer.run
 
-      exporter = ChefDK::PolicyfileServices::ExportRepo.new(
+      exporter = ChefCLI::PolicyfileServices::ExportRepo.new(
         policyfile: policyfile_path,
         export_dir: @tmpdir
       )
@@ -41,8 +44,8 @@ module ChefSpec
 
       ::RSpec.configure do |config|
         config.cookbook_path = [
-          File.join(@tmpdir, 'cookbooks'),
-          File.join(@tmpdir, 'cookbook_artifacts')
+          File.join(@tmpdir, "cookbooks"),
+          File.join(@tmpdir, "cookbook_artifacts"),
         ]
       end
     end

@@ -1,8 +1,10 @@
-require 'chef/resource/conditional'
+require "chef/resource/conditional"
 
-class Chef::Resource::Conditional
+Chef::Resource::Conditional.prepend(Module.new do
   # @see Chef::Resource::Conditional#evaluate_command
   def evaluate_command
+    return super unless $CHEFSPEC_MODE
+
     stub = ChefSpec::Stubs::CommandRegistry.stub_for(@command)
 
     if stub.nil?
@@ -11,4 +13,4 @@ class Chef::Resource::Conditional
 
     stub.result
   end
-end
+end)

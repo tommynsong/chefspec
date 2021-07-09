@@ -1,5 +1,5 @@
-require 'chef/formatters/base'
-require 'chef/formatters/error_mapper'
+require "chef/formatters/base"
+require "chef/formatters/error_mapper"
 
 module ChefSpec
   class ChefFormatter < Chef::Formatters::Base
@@ -133,6 +133,18 @@ module ChefSpec
     # Called when LWRPs are finished loading
     def lwrp_load_complete; end
 
+    # Called when an ohai plugin file loading starts
+    def ohai_plugin_load_start(file_count); end
+
+    # Called when an ohai plugin file has been loaded
+    def ohai_plugin_file_loaded(path); end
+
+    # Called when an ohai plugin file has an error on load.
+    def ohai_plugin_file_load_failed(path, exception); end
+
+    # Called when an ohai plugin file loading has finished
+    def ohai_plugin_load_complete; end
+
     # Called before attribute files are loaded
     def attribute_load_start(attribute_file_count); end
 
@@ -190,7 +202,7 @@ module ChefSpec
     def converge_complete; end
 
     # Called before action is executed on a resource.
-    def resource_action_start(resource, action, notification_type=nil, notifier=nil); end
+    def resource_action_start(resource, action, notification_type = nil, notifier = nil); end
 
     # Called when a resource fails, but will retry.
     def resource_failed_retriable(resource, action, retry_count, exception); end

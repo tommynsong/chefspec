@@ -1,10 +1,9 @@
 require 'chefspec'
 
 describe 'reboot::request' do
-  let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
+  platform 'ubuntu'
 
-  it 'runs a request_reboot' do
-    expect(chef_run).to request_reboot('explicit_action')
+  describe 'runs a request_reboot' do
+    it { is_expected.to request_reboot('explicit_action') }
   end
 end
-

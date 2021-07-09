@@ -1,5 +1,5 @@
-require 'rspec/matchers/expecteds_for_multiple_diffs'
-require 'rspec/expectations/fail_with'
+require "rspec/matchers/expecteds_for_multiple_diffs"
+require "rspec/expectations/fail_with"
 
 module ChefSpec::Matchers
   class ResourceMatcher
@@ -15,13 +15,15 @@ module ChefSpec::Matchers
     end
 
     def at_compile_time
-      raise ArgumentError, 'Cannot specify both .at_converge_time and .at_compile_time!' if @converge_time
+      raise ArgumentError, "Cannot specify both .at_converge_time and .at_compile_time!" if @converge_time
+
       @compile_time = true
       self
     end
 
     def at_converge_time
-      raise ArgumentError, 'Cannot specify both .at_compile_time and .at_converge_time!' if @compile_time
+      raise ArgumentError, "Cannot specify both .at_compile_time and .at_converge_time!" if @compile_time
+
       @converge_time = true
       self
     end
@@ -47,50 +49,43 @@ module ChefSpec::Matchers
 
       if resource
         ChefSpec::Coverage.cover!(resource)
-        resource.performed_action?(@expected_action) && unmatched_parameters.empty? && correct_phase?
-      else
-        false
+        unmatched_parameters.empty? && correct_phase?
       end
     end
 
     def failure_message
       if resource
-        if resource.performed_action?(@expected_action)
-          if unmatched_parameters.empty?
-            if @compile_time
-              %Q{expected "#{resource.to_s}" to be run at compile time}
-            else
-              %Q{expected "#{resource.to_s}" to be run at converge time}
-            end
+        if unmatched_parameters.empty?
+          if @compile_time
+            %Q{expected "#{resource}" to be run at compile time}
           else
-            message = %Q{expected "#{resource.to_s}" to have parameters:} \
+            %Q{expected "#{resource}" to be run at converge time}
+          end
+        else
+          message = %Q{expected "#{resource}" to have parameters:} \
             "\n\n" \
             "  " + unmatched_parameters.collect { |parameter, h|
               msg = "#{parameter} #{h[:expected].inspect}, was #{h[:actual].inspect}"
               diff = ::RSpec::Matchers::ExpectedsForMultipleDiffs.from(h[:expected]) \
-                     .message_with_diff(message, ::RSpec::Expectations::differ, h[:actual])
+                .message_with_diff(message, ::RSpec::Expectations.differ, h[:actual])
               msg += diff if diff
               msg
             }.join("\n  ")
-          end
-        else
-          %Q{expected "#{resource.to_s}" actions #{resource.performed_actions.inspect}} \
-          " to include :#{@expected_action}"
         end
       else
         %Q{expected "#{@resource_name}[#{@expected_identity}]"} \
-        " with action :#{@expected_action} to be in Chef run." \
-        " Other #{@resource_name} resources:" \
-        "\n\n" \
-        "  " + similar_resources.map(&:to_s).join("\n  ") + "\n "
+          " with action :#{@expected_action} to be in Chef run." \
+          " Other #{@resource_name} resources:" \
+          "\n\n" \
+          "  " + similar_resources.map(&:to_s).join("\n  ") + "\n "
       end
     end
 
     def failure_message_when_negated
       if resource
-        message = %Q{expected "#{resource.to_s}" actions #{resource.performed_actions.inspect} to not exist}
+        message = %Q{expected "#{resource}" actions #{resource.performed_actions.inspect} to not exist}
       else
-        message = %Q{expected "#{resource.to_s}" to not exist}
+        message = %Q{expected "#{resource}" to not exist}
       end
 
       message << " at compile time"  if @compile_time
@@ -122,7 +117,7 @@ module ChefSpec::Matchers
       if parameter == :source
         # Chef 11+ stores the source parameter internally as an Array
         Array(expected) == Array(value)
-      elsif expected.kind_of?(Class)
+      elsif expected.is_a?(Class)
         # Ruby can't compare classes with ===
         expected == value
       else
@@ -165,7 +160,7 @@ module ChefSpec::Matchers
     # @return [Chef::Resource, nil]
     #
     def resource
-      @_resource ||= @runner.find_resource(@resource_name, @expected_identity)
+      @_resource ||= @runner.find_resource(@resource_name, @expected_identity, @expected_action)
     end
 
     #

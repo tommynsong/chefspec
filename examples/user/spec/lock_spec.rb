@@ -1,19 +1,19 @@
 require 'chefspec'
 
 describe 'user::lock' do
-  let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
+  platform 'ubuntu'
 
-  it 'locks a user with an explicit action' do
-    expect(chef_run).to lock_user('explicit_action')
-    expect(chef_run).to_not lock_user('not_explicit_action')
+  describe 'locks a user with an explicit action' do
+    it { is_expected.to lock_user('explicit_action') }
+    it { is_expected.to_not lock_user('not_explicit_action') }
   end
 
-  it 'locks a user with attributes' do
-    expect(chef_run).to lock_user('with_attributes').with(uid: '1234')
-    expect(chef_run).to_not lock_user('with_attributes').with(uid: '5678')
+  describe 'locks a user with attributes' do
+    it { is_expected.to lock_user('with_attributes').with(uid: '1234') }
+    it { is_expected.to_not lock_user('with_attributes').with(uid: '5678') }
   end
 
-  it 'locks a user when specifying the identity attribute' do
-    expect(chef_run).to lock_user('identity_attribute')
+  describe 'locks a user when specifying the identity attribute' do
+    it { is_expected.to lock_user('identity_attribute') }
   end
 end

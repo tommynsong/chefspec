@@ -2,8 +2,8 @@ require 'chefspec'
 
 describe 'stub_node::default' do
   let(:my_node) do
-    stub_node('example.com', platform: 'ubuntu', version: '12.04') do |node|
-      node.set['foo']['bar'] = 'zip'
+    stub_node('example.com', platform: 'ubuntu', version: '18.04') do |node|
+      node.normal['foo']['bar'] = 'zip'
     end
   end
 

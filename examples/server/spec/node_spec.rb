@@ -2,8 +2,8 @@ require 'chefspec'
 
 describe 'server::node' do
   let(:chef_run) do
-    ChefSpec::ServerRunner.new do |node, server|
-      server.create_node('bacon', { name: 'bacon' })
+    ChefSpec::ServerRunner.new(platform: 'ubuntu', version: '18.04') do |_node, server|
+      server.create_node('bacon', name: 'bacon')
     end.converge(described_recipe)
   end
 
@@ -18,8 +18,8 @@ describe 'server::node' do
 
   context 'with custom Ohai data' do
     let(:chef_run) do
-      ChefSpec::ServerRunner.new(platform: 'ubuntu', version: '12.04')
-        .converge(described_recipe)
+      ChefSpec::ServerRunner.new(platform: 'ubuntu', version: '18.04')
+                            .converge(described_recipe)
     end
 
     it 'has the node data' do
@@ -27,15 +27,15 @@ describe 'server::node' do
 
       node = chef_run.get_node('chefspec')
       expect(node['kernel']['name']).to eq('Linux')
-      expect(node['kernel']['release']).to eq('3.2.0-92-generic')
+      expect(node['kernel']['release']).to match(/5.4.0-.*-.*/) # avoid failing when fauxhai data changes
       expect(node['kernel']['machine']).to eq('x86_64')
     end
   end
 
   context 'with overridden node data' do
     let(:chef_run) do
-      ChefSpec::ServerRunner.new do |node, server|
-        node.set['breakfast']['bacon'] = true
+      ChefSpec::ServerRunner.new(platform: 'ubuntu', version: '18.04') do |node, _server|
+        node.normal['breakfast']['bacon'] = true
       end.converge(described_recipe)
     end
 

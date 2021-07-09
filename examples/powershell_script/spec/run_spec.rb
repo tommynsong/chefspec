@@ -1,28 +1,19 @@
 require 'chefspec'
 
-RSpec.configure do |config|
-  config.platform = 'windows'
-  config.version  = '2012R2'
-end
-
 describe 'powershell_script::run' do
-  let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
+  platform 'windows'
 
-  it 'runs a powershell_script with the default action' do
-    expect(chef_run).to run_powershell_script('default_action')
-    expect(chef_run).to_not run_powershell_script('not_default_action')
+  describe 'runs a powershell_script with the default action' do
+    it { is_expected.to run_powershell_script('default_action') }
+    it { is_expected.to_not run_powershell_script('not_default_action') }
   end
 
-  it 'runs a powershell_script with an explicit action' do
-    expect(chef_run).to run_powershell_script('explicit_action')
+  describe 'runs a powershell_script with an explicit action' do
+    it { is_expected.to run_powershell_script('explicit_action') }
   end
 
-  it 'runs a powershell_script with attributes' do
-    expect(chef_run).to run_powershell_script('with_attributes').with(flags: '--flags')
-    expect(chef_run).to_not run_powershell_script('with_attributes').with(flags: '--not-flags')
-  end
-
-  it 'runs a powershell_script when specifying the identity attribute' do
-    expect(chef_run).to run_powershell_script('identity_attribute')
+  describe 'runs a powershell_script with attributes' do
+    it { is_expected.to run_powershell_script('with_attributes').with(flags: anything) }
+    it { is_expected.to_not run_powershell_script('with_attributes').with(flags: '--not-flags') }
   end
 end

@@ -5,7 +5,7 @@ describe 'server::search' do
     stub_node('node_1') do |node|
       node.automatic['hostname'] = 'node_1'
       node.automatic['fqdn'] = 'node_1.example.com'
-      node.set['bar'] = true
+      node.normal['bar'] = true
     end
   end
 
@@ -13,7 +13,7 @@ describe 'server::search' do
     stub_node('node_2') do |node|
       node.automatic['hostname'] = 'node_2'
       node.automatic['fqdn'] = 'node_2.example.com'
-      node.set['bar'] = true
+      node.normal['bar'] = true
     end
   end
 
@@ -21,7 +21,7 @@ describe 'server::search' do
     stub_node('node_3') do |node|
       node.automatic['hostname'] = 'node_3'
       node.automatic['fqdn'] = 'node_3.example.com'
-      node.set['bar'] = true
+      node.normal['bar'] = true
     end
   end
 
@@ -33,8 +33,8 @@ describe 'server::search' do
   end
 
   let(:chef_run) do
-    ChefSpec::ServerRunner.new do |node, server|
-      node.set['bar'] = true
+    ChefSpec::ServerRunner.new(platform: 'ubuntu', version: '18.04') do |node, server|
+      node.normal['bar'] = true
       server.update_node(node)
 
       server.create_node(node_1)
@@ -47,7 +47,7 @@ describe 'server::search' do
   it 'finds all nodes with the bar attribute' do
     expect(chef_run).to write_log('nodes with an attribute')
       .with_message(<<-EOH.gsub(/^ {8}/, '').strip)
-        chefspec, FQDN: chefspec.local, hostname: chefspec
+        chefspec, FQDN: fauxhai.local, hostname: Fauxhai
         node_1, FQDN: node_1.example.com, hostname: node_1
         node_2, FQDN: node_2.example.com, hostname: node_2
         node_3, FQDN: node_3.example.com, hostname: node_3

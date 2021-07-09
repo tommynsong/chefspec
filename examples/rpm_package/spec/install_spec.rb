@@ -1,28 +1,23 @@
 require 'chefspec'
 
-RSpec.configure do |config|
-  config.platform = 'centos'
-  config.version  = '6.5'
-end
-
 describe 'rpm_package::install' do
-  let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
+  platform 'centos'
 
-  it 'installs a rpm_package with the default action' do
-    expect(chef_run).to install_rpm_package('default_action')
-    expect(chef_run).to_not install_rpm_package('not_default_action')
+  describe 'installs a rpm_package with the default action' do
+    it { is_expected.to install_rpm_package('default_action') }
+    it { is_expected.to_not install_rpm_package('not_default_action') }
   end
 
-  it 'installs a rpm_package with an explicit action' do
-    expect(chef_run).to install_rpm_package('explicit_action')
+  describe 'installs a rpm_package with an explicit action' do
+    it { is_expected.to install_rpm_package('explicit_action') }
   end
 
-  it 'installs a rpm_package with attributes' do
-    expect(chef_run).to install_rpm_package('with_attributes').with(version: '1.0.0')
-    expect(chef_run).to_not install_rpm_package('with_attributes').with(version: '1.2.3')
+  describe 'installs a rpm_package with attributes' do
+    it { is_expected.to install_rpm_package('with_attributes').with(version: '1.0.0') }
+    it { is_expected.to_not install_rpm_package('with_attributes').with(version: '1.2.3') }
   end
 
-  it 'installs a rpm_package when specifying the identity attribute' do
-    expect(chef_run).to install_rpm_package('identity_attribute')
+  describe 'installs a rpm_package when specifying the identity attribute' do
+    it { is_expected.to install_rpm_package('identity_attribute') }
   end
 end

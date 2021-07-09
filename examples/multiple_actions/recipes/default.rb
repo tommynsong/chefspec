@@ -1,3 +1,3 @@
 service 'resource' do
-  action [:enable, :start]
+  action %i(enable start)
 end

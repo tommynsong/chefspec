@@ -1,24 +1,19 @@
 require 'chefspec'
 
-RSpec.configure do |config|
-  config.platform = 'ubuntu'
-  config.version  = '14.04'
-end
-
 describe 'dpkg_package::remove' do
-  let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
+  platform 'ubuntu'
 
-  it 'removes a dpkg_package with an explicit action' do
-    expect(chef_run).to remove_dpkg_package('explicit_action')
-    expect(chef_run).to_not remove_dpkg_package('not_explicit_action')
+  describe 'removes a dpkg_package with an explicit action' do
+    it { is_expected.to remove_dpkg_package('explicit_action') }
+    it { is_expected.to_not remove_dpkg_package('not_explicit_action') }
   end
 
-  it 'removes a dpkg_package with attributes' do
-    expect(chef_run).to remove_dpkg_package('with_attributes').with(version: '1.0.0')
-    expect(chef_run).to_not remove_dpkg_package('with_attributes').with(version: '1.2.3')
+  describe 'removes a dpkg_package with attributes' do
+    it { is_expected.to remove_dpkg_package('with_attributes').with(version: '1.0.0') }
+    it { is_expected.to_not remove_dpkg_package('with_attributes').with(version: '1.2.3') }
   end
 
-  it 'removes a dpkg_package when specifying the identity attribute' do
-    expect(chef_run).to remove_dpkg_package('identity_attribute')
+  describe 'removes a dpkg_package when specifying the identity attribute' do
+    it { is_expected.to remove_dpkg_package('identity_attribute') }
   end
 end
